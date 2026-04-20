@@ -1,0 +1,508 @@
+01. 다음숫자와 문자, null에 관한 내장 함수의 결과를 적으시오
+ABS(-15) → 15
+→ 음수를 양수로 바꿈 (절대값)
+
+COS(3.14159) → -1
+→ π(파이) 값이라 cos 결과는 거의 -1
+
+LOG(10,100) → 2
+→ 10을 몇 번 곱하면 100? → 2번
+
+POWER(3,2) → 9
+→ 3을 2번 곱함 → 3²
+
+SIGN(-15) → -1
+→ 음수면 -1, 양수면 1, 0이면 0
+
+CHR(67) → 'C'
+→ 숫자를 문자로 바꿈 (아스키코드)
+
+LOWER('Birthday') → 'birthday'
+→ 소문자로 변환
+
+LTRIM('Page 1','ae') → 'Page 1'
+→ 왼쪽에서 a,e 제거
+→ 근데 P부터 시작이라 그대로
+
+RPAD('Page 1',15,'*') → 'Page 1********'
+→ 오른쪽에 * 붙여서 길이 15 맞춤
+
+SUBSTR('ABCDERG',3,4) → 'CDER'
+→ 3번째부터 4글자 자름
+
+UPPER('Birthdaty') → 'BIRTHDATY'
+→ 대문자로 변환
+
+NVL(NULL,123) → 123
+→ NULL이면 대신 123 사용
+
+LENGTH('Birthday') → 8
+→ 글자 개수
+
+TO_NUMBER('12.3') → 12.3
+→ 문자열을 숫자로 변환
+
+DECODE(1.1,'aa','bb') → 오류
+→ 숫자랑 문자 비교라서 에러
+
+CEIL(15.7) → 16
+→ 무조건 올림
+
+FLOOR(15.7) → 15
+→ 무조건 내림
+
+MOD(11,4) → 3
+→ 나머지 구하기
+
+ROUND(15.7) → 16
+→ 반올림
+
+TRUNC(15.7) → 15
+→ 소수점 그냥 버림
+
+CONCAT('HAPPY','Birthday') → 'HAPPYBirthday'
+→ 문자열 이어붙이기
+
+LPAD('Page 1',15,'*.') → '*.*.*.*.*Page 1'
+→ 왼쪽을 *., 반복해서 채움
+
+REPLACE('JACK','J','BL') → 'BLACK'
+→ J를 BL로 바꿈
+
+RTRIM('Page 1','ae') → 'Page 1'
+→ 오른쪽에서 a,e 제거 (없어서 그대로)
+
+TRIM(LEADING 0 FROM '00AA00') → 'AA00'
+→ 앞쪽 0 제거
+
+ASCII('A') → 65
+→ 문자를 숫자로 바꿈
+
+INSTR('CORPORATE FLOOR','OR',3,2) → 14
+→ 3번째부터 시작해서
+→ "OR" 두 번째 위치 찾기
+
+TO_CHAR(123) → '123'
+→ 숫자를 문자로 변환
+
+TO_DATE('20250708','yyyyddmm') → 2025-08-07
+→ 형식대로 날짜로 변환
+(yyyy=2025, dd=07, mm=08)
+
+NULLIF(123,345) → 123
+→ 값이 다르면 첫 번째 값 반환
+→ 같으면 NULL
+
+
+02. 다음날짜를 처리하는 내장함수의 결과를 적으시오
+SYSDATE → 현재 날짜/시간
+→ 지금 이 순간의 날짜 + 시간 반환
+👉 예: 2026-04-16 10:30 (실행할 때마다 바뀜)
+
+TO_CHAR(SYSDATE) → 문자형 날짜
+→ 날짜를 문자열로 바꿈
+👉 기본형이면: '16-APR-26' 같은 형태
+
+ADD_MONTHS('14/05/21',1) → 2014-06-21
+→ 1개월 더함
+👉 2014년 5월 21일 → 6월 21일
+
+NEXT_DAY(SYSDATE,'화') → 다음 화요일
+→ 오늘 이후 가장 가까운 화요일
+👉 예: 오늘이 목요일이면 → 다음 화요일
+
+ROUND(SYSDATE) → 날짜 반올림 (12시 기준)
+→ 시간 기준으로 날짜 반올림
+👉 낮 12시 이전 → 오늘
+👉 낮 12시 이후 → 다음날
+
+TO_DATE('12 05 2025','DD MM YYYY') → 2025-05-12
+→ 문자열을 날짜로 변환
+👉 12일 / 5월 / 2025년
+
+LAST_DAY(SYSDATE) → 해당 월 마지막 날짜
+→ 해당 월의 마지막 날
+👉 예: 4월이면 → 4월 30일
+
+
+뷰 실습예제
+마당서점 복합 뷰 생성문제
+sql-- 고객 테이블
+Customer(custid, name, address, phone)-- 도서 테이블
+Book(bookid, bookname, publisher, price)-- 주문 테이블
+Orders(orderid, custid, bookid, saleprice, orderdate)
+
+문제 1.
+고객별 총 주문금액과 주문 횟수를 보여주는 뷰 v_cust_order_summary를 작성하시오.
+(출력 컬럼: 고객이름, 총주문금액, 주문횟수)
+create view v_cust_order_summary as select c.name as 고객이름, sum(o.saleprice) as 총주문금액, count(*) as 주문횟수 from customer c, orders o where c.custid = o.custid group by c.name;
+
+문제 2.
+각 도서의 도서명, 출판사, 판매된 총 수량(주문 횟수), 총 판매금액을 보여주는 뷰 
+v_book_sales를 작성하시오.
+create view v_book_sales as select b.bookname as 도서명, b.publisher as 출판사, count(*) as 판매수량, sum(o.saleprice) as 총판매금액 from book b, orders o where b.bookid = o.bookid group by b.bookname, b.publisher;
+
+문제 3.
+주문한 적 있는 고객의 이름, 주소, 가장 최근 주문일을 보여주는 뷰 v_cust_last_order를 작성하시오.
+create view v_cust_last_order as select c.name as 고객이름, c.address as 주소, max(o.orderdate) as 최근주문일 from customer c, orders o where c.custid = o.custid group by c.name, c.address;
+
+문제 4.
+도서 정가보다 할인된 금액으로 판매된 주문 내역을 보여주는 뷰 v_discounted_orders를 작성하시오.
+(출력 컬럼: 주문번호, 고객이름, 도서명, 정가, 판매가, 할인금액)
+create view v_discounted_orders as select o.orderid as 주문번호, c.name as 고객이름, b.bookname as 도서명, b.price as 정가, o.saleprice as 판매가,(b.price - o.saleprice) as 할인금액 from orders o, customer c, book b where o.custid = c.custid and o.bookid = b.bookid and b.price > o.saleprice;
+
+문제 5.
+출판사별 평균 판매가격과 최고 판매가격을 보여주는 뷰 v_publisher_stats를 작성하시오.
+(출력 컬럼: 출판사, 평균판매가, 최고판매가)
+create view v_publisher_stats as select b.publisher as 출판사, avg(o.saleprice) as "평균판매가", max(o.saleprice) as "최고판매가" from book b, orders o where b.bookid = o.bookid group by b.publisher;
+
+문제 6.
+총 주문금액이 30,000원 이상인 우수 고객의 이름과 총 주문금액을 보여주는 뷰 v_vip_customer를 작성하시오.
+create view v_vip_customer as select c.name as 고객이름, sum(o.saleprice) as 총주문금액 from customer c, orders o where c.custid = o.custid group by c.name having sum(o.saleprice) >= 30000;
+
+문제 7.
+2024년에 주문된 내역의 고객이름, 도서명, 판매가격, 주문일자를 보여주는 뷰 v_orders_2024를 작성하시오.
+create view v_orders_2024 as select c.name as 고객이름, b.bookname as 도서명, o.saleprice as 판매가격, o.orderdate as 주문일자 from orders o, customer c, book b where o.custid = c.custid and o.bookid = b.bookid and to_char(o.orderdate, 'YYYY') = '2024';
+
+문제 8.
+한 번도 주문되지 않은 도서의 도서명과 출판사, 정가를 보여주는 뷰 v_unsold_books를 작성하시오.
+create view v_unsold_books as select b.bookname, b.publisher, b.price from book b where b.bookid not in(select bookid from orders);
+
+문제 9.
+고객별로 가장 비싸게 구매한 도서명과 그 금액을 보여주는 뷰 v_cust_max_order를 작성하시오.
+(출력 컬럼: 고객이름, 도서명, 최고구매금액)
+create view v_cust_max_order as select c.name as 고객이름, b.bookname as 도서명, o.saleprice as 최고구매금액 from orders o, customer c, book b where o.custid = c.custid and o.bookid = b.bookid and o.saleprice = (select max(o2.saleprice)from orders o2 where o2.custid = o.custid);
+
+문제 10.
+도서명, 고객이름, 판매가, 해당 도서 평균 판매가, 평균 대비 차이를 보여주는 뷰 v_book_price_compare를 작성하시오.
+(출력 컬럼: 도서명, 고객이름, 판매가, 도서평균판매가, 차이)
+create view v_book_price_compare as select b.bookname as 도서명, c.name as 고객이름, o.saleprice as 판매가,(select avg(o2.saleprice) from orders o2 where o2.bookid = o.bookid) as 도서평균판매가, o.saleprice -(select avg(o2.saleprice)from orders o2 where o2.bookid = o.bookid)as 차이 from orders o, customer c, book b where o.custid = c.custid and o.bookid = b.bookid;
+
+
+[복합 뷰 문제]
+문제 1.
+출판사별로 판매된 도서 수와 총 판매금액을 보여주는 뷰 v_publisher_sales를 작성하시오.
+(출력 컬럼: 출판사, 판매도서수, 총판매금액)
+CREATE VIEW v_publisher_sales AS
+SELECT b.publisher AS 출판사,
+       COUNT(*) AS 판매도서수,
+       SUM(o.saleprice) AS 총판매금액
+FROM book b, orders o
+WHERE b.bookid = o.bookid
+GROUP BY b.publisher;
+
+문제 2.
+고객별 평균 구매금액을 계산하고, 전체 고객 평균보다 높은 고객만 보여주는 뷰 v_above_avg_customer를 작성하시오.
+(출력 컬럼: 고객이름, 평균구매금액)
+CREATE VIEW v_above_avg_customer AS
+SELECT c.name AS 고객이름,
+       AVG(o.saleprice) AS 평균구매금액
+FROM customer c, orders o
+WHERE c.custid = o.custid
+GROUP BY c.name
+HAVING AVG(o.saleprice) > (
+    SELECT AVG(saleprice) FROM orders
+);
+
+문제 3.
+주문 내역에서 도서명, 고객이름, 주문일자, 판매가격을 출력하되 판매가격이 높은 순으로 정렬된 뷰 v_orders_detail을 작성하시오.
+CREATE VIEW v_orders_detail AS
+SELECT b.bookname, c.name, o.orderdate, o.saleprice
+FROM orders o, customer c, book b
+WHERE o.custid = c.custid
+AND o.bookid = b.bookid
+ORDER BY o.saleprice DESC;
+
+문제 4.
+2권 이상 주문한 고객의 이름과 주문 횟수를 보여주는 뷰 v_frequent_customer를 작성하시오.
+CREATE VIEW v_frequent_customer AS
+SELECT c.name, COUNT(*) AS 주문횟수
+FROM customer c, orders o
+WHERE c.custid = o.custid
+GROUP BY c.name
+HAVING COUNT(*) >= 2;
+
+문제 5.
+각 고객이 마지막으로 주문한 도서명과 주문일자를 보여주는 뷰 v_last_ordered_book을 작성하시오.
+(출력 컬럼: 고객이름, 도서명, 주문일자)
+CREATE VIEW v_last_ordered_book AS
+SELECT c.name AS 고객이름,
+       b.bookname AS 도서명,
+       o.orderdate AS 주문일자
+FROM orders o, customer c, book b
+WHERE o.custid = c.custid
+AND o.bookid = b.bookid
+AND o.orderdate = (
+    SELECT MAX(o2.orderdate)
+    FROM orders o2
+    WHERE o2.custid = o.custid
+);
+
+문제 6.
+도서 정가 대비 평균 할인율이 가장 높은 출판사 순으로 보여주는 뷰 v_publisher_discount_rate를 작성하시오.
+(출력 컬럼: 출판사, 평균할인율)
+단, 정가보다 낮게 팔린 경우만 포함한다.
+CREATE VIEW v_publisher_discount_rate AS
+SELECT b.publisher AS 출판사,
+       AVG((b.price - o.saleprice) / b.price) AS 평균할인율
+FROM book b, orders o
+WHERE b.bookid = o.bookid
+AND b.price > o.saleprice
+GROUP BY b.publisher
+ORDER BY 평균할인율 DESC;
+
+문제 7.
+한 번이라도 주문한 적 있는 고객과 한 번도 주문하지 않은 고객을 구분하여 보여주는 뷰 v_customer_order_status를 작성하시오.
+(출력 컬럼: 고객이름, 주문여부)
+단, 주문여부는 '주문있음' / '주문없음'으로 표시한다.
+CREATE VIEW v_customer_order_status AS
+SELECT c.name AS 고객이름,
+       CASE 
+           WHEN o.custid IS NOT NULL THEN '주문있음'
+           ELSE '주문없음'
+       END AS 주문여부
+FROM customer c
+LEFT JOIN orders o ON c.custid = o.custid;
+
+문제 8.
+월별 총 판매금액과 주문 건수를 보여주는 뷰 v_monthly_sales를 작성하시오.
+(출력 컬럼: 년도, 월, 총판매금액, 주문건수)
+CREATE VIEW v_monthly_sales AS
+SELECT TO_CHAR(o.orderdate, 'YYYY') AS 년도,
+       TO_CHAR(o.orderdate, 'MM') AS 월,
+       SUM(o.saleprice) AS 총판매금액,
+       COUNT(*) AS 주문건수
+FROM orders o
+GROUP BY TO_CHAR(o.orderdate, 'YYYY'),
+         TO_CHAR(o.orderdate, 'MM');
+
+문제 9.
+같은 출판사의 도서를 2종류 이상 구매한 고객의 이름과 출판사, 구매 종류 수를 보여주는 
+뷰 v_publisher_loyal_customer를 작성하시오.
+CREATE VIEW v_publisher_loyal_customer AS
+SELECT c.name AS 고객이름,
+       b.publisher AS 출판사,
+       COUNT(DISTINCT b.bookid) AS 구매종류수
+FROM customer c, orders o, book b
+WHERE c.custid = o.custid
+AND o.bookid = b.bookid
+GROUP BY c.name, b.publisher
+HAVING COUNT(DISTINCT b.bookid) >= 2;
+
+문제 10.
+도서별로 최고가, 최저가, 평균가로 판매된 가격과 정가 대비 최대 할인금액을 보여주는 뷰 v_book_price_stats를 작성하시오.
+(출력 컬럼: 도서명, 출판사, 최고판매가, 최저판매가, 평균판매가, 최대할인금액)
+CREATE VIEW v_book_price_stats AS
+SELECT b.bookname AS 도서명,
+       b.publisher AS 출판사,
+       MAX(o.saleprice) AS 최고판매가,
+       MIN(o.saleprice) AS 최저판매가,
+       AVG(o.saleprice) AS 평균판매가,
+       MAX(b.price - o.saleprice) AS 최대할인금액
+FROM book b, orders o
+WHERE b.bookid = o.bookid
+GROUP BY b.bookname, b.publisher;
+
+[사원 데이터베이스]
+문제 1.
+모든 사원의 사원번호, 이름, 부서명, 직급, 급여를 보여주는 뷰 v_emp_basic을 작성하시오.
+CREATE VIEW v_emp_basic AS
+SELECT e.empno, e.ename, d.dname, e.job, e.sal
+FROM emp e, dept d
+WHERE e.deptno = d.deptno;
+
+문제 2.
+급여가 500만원 이상인 사원의 이름, 직급, 급여, 부서명을 보여주는읽기 전용 뷰 v_high_salary_emp를 작성하시오.
+CREATE VIEW v_high_salary_emp AS
+SELECT e.ename, e.job, e.sal, d.dname
+FROM emp e, dept d
+WHERE e.deptno = d.deptno
+AND e.sal >= 5000000
+WITH READ ONLY;
+
+문제 3.
+현재 진행 중인 프로젝트(오늘 날짜가 시작일과 종료일 사이)의 프로젝트번호, 프로젝트명, 시작일, 종료일을 보여주는 뷰 v_active_projects를 작성하시오.
+CREATE VIEW v_active_projects AS
+SELECT *
+FROM project
+WHERE SYSDATE BETWEEN start_date AND end_date;
+
+문제 4.
+입사일이 2019년 이전인 사원의 사원번호, 이름, 부서명, 입사일, 근속연수를 보여주는 뷰 v_veteran_employee를 작성하시오.
+(근속연수는 현재 연도 기준으로 계산)
+CREATE VIEW v_veteran_employee AS
+SELECT e.empno, e.ename, d.dname, e.hiredate,
+       (EXTRACT(YEAR FROM SYSDATE) - EXTRACT(YEAR FROM e.hiredate)) AS 근속연수
+FROM emp e, dept d
+WHERE e.deptno = d.deptno
+AND e.hiredate < TO_DATE('2019-01-01','YYYY-MM-DD');
+
+문제 5.
+부서 위치가 '서울'인 부서의 부서번호, 부서명, 예산을 보여주는 뷰 v_seoul_department 를 작성하시오.
+CREATE VIEW v_seoul_department AS
+SELECT deptno, dname, budget
+FROM dept
+WHERE location = '서울';
+
+문제 6.
+직급이 '부장' 또는 '이사'인 사원의 사원번호, 이름, 직급, 급여를 보여주는 읽기 전용 뷰 v_senior_position를 작성하시오.
+CREATE VIEW v_senior_position AS
+SELECT empno, ename, job, sal
+FROM emp
+WHERE job IN ('부장','이사')
+WITH READ ONLY;
+
+문제 7.
+프로젝트에서 'PM' 역할을 담당하는 사원의 사원번호, 프로젝트번호, 담당역할, 투입시간을 보여주는 뷰 v_pm_role을 작성하시오.
+CREATE VIEW v_pm_role AS
+SELECT empno, projectno, role, hours
+FROM emp_project
+WHERE role = 'PM';
+
+문제 8.
+급여가 300만원 미만인 사원 중 입사일이 2022년 이후인 사원의 이름, 직급, 급여, 입사일을 보여주는 뷰 v_junior_emp를 작성하시오.
+CREATE VIEW v_junior_emp AS
+SELECT ename, job, sal, hiredate
+FROM emp
+WHERE sal < 3000000
+AND hiredate >= TO_DATE('2022-01-01','YYYY-MM-DD');
+
+문제 9.
+예산이 1억원 이상인 프로젝트의 프로젝트명, 시작일, 종료일, 예산을 보여주는읽기 전용 뷰 v_large_budget_project를 작성하시오.
+CREATE VIEW v_large_budget_project AS
+SELECT projectname, start_date, end_date, budget
+FROM project
+WHERE budget >= 100000000
+WITH READ ONLY;
+
+문제 10.
+관리자가 없는 최상위 관리자이면서 급여가 700만원 이상인 사원의 사원번호, 이름, 부서명, 직급, 급여를 보여주는 읽기 전용 뷰 v_top_executive를 작성하시오.
+CREATE VIEW v_top_executive AS
+SELECT e.empno, e.ename, d.dname, e.job, e.sal
+FROM emp e, dept d
+WHERE e.deptno = d.deptno
+AND e.mgr IS NULL
+AND e.sal >= 7000000
+WITH READ ONLY;
+
+
+[복합 뷰]
+문제 1.
+부서별 평균 급여와 최고 급여, 최저 급여를 보여주는 뷰 v_dept_salary_stats를 작성하시오.
+(출력 컬럼: 부서명, 평균급여, 최고급여, 최저급여)
+CREATE VIEW v_dept_salary_stats AS
+SELECT d.dname AS 부서명,
+       AVG(e.sal) AS 평균급여,
+       MAX(e.sal) AS 최고급여,
+       MIN(e.sal) AS 최저급여
+FROM emp e, dept d
+WHERE e.deptno = d.deptno
+GROUP BY d.dname;
+
+문제 2.
+각 사원이 참여한 프로젝트 수와 총 투입시간을 보여주는 뷰 v_emp_project_summary를 작성하시오.
+(출력 컬럼: 사원이름, 참여프로젝트수, 총투입시간)
+CREATE VIEW v_emp_project_summary AS
+SELECT e.ename AS 사원이름,
+       COUNT(ep.projectno) AS 참여프로젝트수,
+       SUM(ep.hours) AS 총투입시간
+FROM emp e, emp_project ep
+WHERE e.empno = ep.empno
+GROUP BY e.ename;
+
+문제 3.
+부서별 예산 대비 해당 부서 사원들의 평균 급여 비율을 보여주는 뷰 v_dept_budget_ratio를 작성하시오.
+(출력 컬럼: 부서명, 부서예산, 평균급여, 급여예산비율)
+단, 급여예산비율은 소수점 2자리까지 표시한다.
+CREATE VIEW v_dept_budget_ratio AS
+SELECT d.dname AS 부서명,
+       d.budget AS 부서예산,
+       AVG(e.sal) AS 평균급여,
+       ROUND(AVG(e.sal)/d.budget, 2) AS 급여예산비율
+FROM emp e, dept d
+WHERE e.deptno = d.deptno
+GROUP BY d.dname, d.budget;
+
+문제 4.
+현재 진행 중인 프로젝트에 참여하고 있는 사원의 이름, 부서명, 프로젝트명, 담당역할을 보여주는 뷰 v_active_project_emp를 작성하시오.
+CREATE VIEW v_active_project_emp AS
+SELECT e.ename, d.dname, p.projectname, ep.role
+FROM emp e, dept d, project p, emp_project ep
+WHERE e.empno = ep.empno
+AND e.deptno = d.deptno
+AND p.projectno = ep.projectno
+AND SYSDATE BETWEEN p.start_date AND p.end_date;
+
+문제 5.
+한 번도 프로젝트에 참여하지 않은 사원의 사원번호, 이름, 부서명, 직급을 보여주는 뷰 v_no_project_emp를 작성하시오.
+CREATE VIEW v_no_project_emp AS
+SELECT e.empno, e.ename, d.dname, e.job
+FROM emp e, dept d
+WHERE e.deptno = d.deptno
+AND e.empno NOT IN (SELECT empno FROM emp_project);
+
+문제 6.
+프로젝트별 참여 사원 수와 총 투입시간, 평균 투입시간을 보여주는 뷰 v_project_stats를 작성하시오.
+(출력 컬럼: 프로젝트명, 참여사원수, 총투입시간, 평균투입시간)
+CREATE VIEW v_project_stats AS
+SELECT p.projectname,
+       COUNT(ep.empno) AS 참여사원수,
+       SUM(ep.hours) AS 총투입시간,
+       AVG(ep.hours) AS 평균투입시간
+FROM project p, emp_project ep
+WHERE p.projectno = ep.projectno
+GROUP BY p.projectname;
+
+문제 7.
+자신이 속한 부서의 평균 급여보다 높은 급여를 받는 사원의 이름, 부서명, 급여, 부서평균급여를 보여주는 뷰 v_above_dept_avg를 작성하시오.
+CREATE VIEW v_above_dept_avg AS
+SELECT e.ename,
+       d.dname,
+       e.sal,
+       (SELECT AVG(e2.sal)
+        FROM emp e2
+        WHERE e2.deptno = e.deptno) AS 부서평균급여
+FROM emp e, dept d
+WHERE e.deptno = d.deptno
+AND e.sal > (
+    SELECT AVG(e2.sal)
+    FROM emp e2
+    WHERE e2.deptno = e.deptno
+);
+
+문제 8.
+각 부서에서 가장 오래 근무한 사원의 이름, 부서명, 입사일, 근속연수를 보여주는 뷰 v_longest_serving를 작성하시오.
+CREATE VIEW v_longest_serving AS
+SELECT e.ename, d.dname, e.hiredate,
+       (EXTRACT(YEAR FROM SYSDATE) - EXTRACT(YEAR FROM e.hiredate)) AS 근속연수
+FROM emp e, dept d
+WHERE e.deptno = d.deptno
+AND e.hiredate = (
+    SELECT MIN(hiredate)
+    FROM emp e2
+    WHERE e2.deptno = e.deptno
+);
+
+문제 9.
+2개 이상의 프로젝트에 참여하면서 총 투입시간이 100시간 이상인 사원의 이름, 참여프로젝트수, 총투입시간을 보여주는 뷰 v_active_emp를 작성하시오.
+CREATE VIEW v_active_emp AS
+SELECT e.ename,
+       COUNT(ep.projectno) AS 참여프로젝트수,
+       SUM(ep.hours) AS 총투입시간
+FROM emp e, emp_project ep
+WHERE e.empno = ep.empno
+GROUP BY e.ename
+HAVING COUNT(ep.projectno) >= 2
+AND SUM(ep.hours) >= 100;
+
+문제 10.
+부서별로 'PM' 역할을 맡은 사원 수와 해당 부서의 평균 급여를 보여주는 뷰 v_dept_pm_stats를 작성하시오.
+(출력 컬럼: 부서명, PM수, 부서평균급여)
+CREATE VIEW v_dept_pm_stats AS
+SELECT d.dname AS 부서명,
+       SUM(CASE WHEN ep.role = 'PM' THEN 1 ELSE 0 END) AS PM수,
+       AVG(e.sal) AS 부서평균급여
+FROM emp e, dept d, emp_project ep
+WHERE e.deptno = d.deptno
+AND e.empno = ep.empno
+GROUP BY d.dname;
